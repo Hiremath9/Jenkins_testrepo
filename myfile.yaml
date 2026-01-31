@@ -1,0 +1,50 @@
+---
+ - hosts: localhost
+   become: yes
+   ignore_errors: yes
+   tasks:
+     - name: Installing the apache
+       yum:
+         name: httpd
+         state: present
+
+     - name: vERIFYING the package installed or not
+       shell:
+          "rpm -qi httpd"
+       register: verify_packae
+
+
+     - name: check the detais of installed package
+       set_fact:
+         pou: "{{ verify_packae['rc'] }}"     
+
+     - name: package httpd installed
+       debug:
+         msg: "Package httpd installed"
+       when:
+         - pou == "0"
+
+     - name: package httpd installed
+       debug:
+         msg: "Package httpd not installed"    
+       when:
+         - pou != "0"
+
+     - name: service starting
+       service:
+          name: httpd
+          state: started
+
+     - name: Copying the web html
+       copy:
+         src: /tmp/index.html
+         dest: /var/www/html
+
+     - name: checking the url access
+       uri:
+        url: "http://localhost:80"   
+       register: webres
+
+     - name: checking webpage result
+       debug:
+         msg: "{{ webres }}"
