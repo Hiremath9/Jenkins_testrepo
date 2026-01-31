@@ -3,7 +3,7 @@
    become: yes
    ignore_errors: yes
    tasks:
-     - name: Installing the apache
+     - name: Installing the apachesss
        yum:
          name: httpd
          state: present
